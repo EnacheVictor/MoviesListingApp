@@ -22,7 +22,7 @@ fun MoviesNavHost(
 
         composable("detail/{movieId}") { backStackEntry ->
             val movieId = backStackEntry.arguments?.getString("movieId")
-            DetailScreen(movieId)
+            DetailScreen(movieId, navController)
         }
     }
 

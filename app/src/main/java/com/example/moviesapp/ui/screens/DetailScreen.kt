@@ -14,12 +14,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.moviesapp.data.MovieData
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun DetailScreen(movieId: String?) {
+fun DetailScreen(movieId: String? , navController: NavController) {
 
     val movie = movieId?.toIntOrNull()?.let { id ->
         MovieData.movieList.find { it.id == id }
@@ -27,7 +32,17 @@ fun DetailScreen(movieId: String?) {
 
     Scaffold (
         topBar = {
-            TopAppBar(title = { Text(movie?.title ?:"Movie Detail") })
+            TopAppBar(
+                title = { Text(movie?.title ?: "Movie Detail") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         }
     ) { scaffoldPadding ->
         movie?.let{
