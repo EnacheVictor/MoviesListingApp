@@ -1,6 +1,6 @@
 package com.example.moviesapp.ui.screens
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,42 +12,45 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.moviesapp.data.MovieData
 import com.example.moviesapp.model.Movie
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Movie App") }
             )
         }
-    ) { padding ->
+    ) { scaffoldPadding ->
         LazyColumn(
-            contentPadding = padding,
+            contentPadding = scaffoldPadding,
             modifier = Modifier.fillMaxSize()
         ) {
             items(MovieData.movieList) { movie ->
-                MovieItem(movie = movie)
+                MovieItem(movie = movie){
+                    navController.navigate("detail/${movie.id}")
+                }
             }
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(movie: Movie, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        modifier = Modifier.padding(8.dp).fillMaxWidth().clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier.padding(8.dp)
         ) {
-            Image(
-                painter = rememberAsyncImagePainter(movie.posterUrl),
+            AsyncImage(
+                model = movie.posterUrl,
                 contentDescription = movie.title,
                 modifier = Modifier.size(100.dp),
                 contentScale = ContentScale.Crop
