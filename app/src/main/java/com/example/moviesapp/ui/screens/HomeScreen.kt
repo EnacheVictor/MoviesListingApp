@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +20,8 @@ import com.example.moviesapp.model.Movie
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
+    var searchQuery by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -27,13 +29,32 @@ fun HomeScreen(navController: NavController) {
             )
         }
     ) { scaffoldPadding ->
-        LazyColumn(
-            contentPadding = scaffoldPadding,
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(scaffoldPadding)
         ) {
-            items(MovieData.movieList) { movie ->
-                MovieItem(movie = movie){
-                    navController.navigate("detail/${movie.id}")
+
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Caută film") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            val filteredList = MovieData.movieList.filter {
+                it.title.contains(searchQuery, ignoreCase = true)
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(filteredList) { movie ->
+                    MovieItem(movie = movie) {
+                        navController.navigate("detail/${movie.id}")
+                    }
                 }
             }
         }
@@ -43,7 +64,10 @@ fun HomeScreen(navController: NavController) {
 @Composable
 fun MovieItem(movie: Movie, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.padding(8.dp).fillMaxWidth().clickable { onClick() },
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
@@ -55,28 +79,17 @@ fun MovieItem(movie: Movie, onClick: () -> Unit) {
                 modifier = Modifier.size(100.dp),
                 contentScale = ContentScale.Crop
             )
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = movie.title,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Spacer(
-                    modifier = Modifier.height(4.dp)
-                )
-                Text(
-                    text = "Rating: ${movie.rating}"
-                )
-                Text(
-                    text = "Year: ${movie.year}"
-                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Rating: ${movie.rating}")
+                Text("Year: ${movie.year}")
             }
-
         }
     }
 }
